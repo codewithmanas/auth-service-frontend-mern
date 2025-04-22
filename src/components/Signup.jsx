@@ -1,16 +1,20 @@
 import clsx from "clsx";
-import { Eye, EyeOff, Github, Mail } from "lucide-react";
+import { Eye, EyeOff, Github, LoaderCircle, Mail } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router";
+import axios from "axios";
+import { BACKEND_BASE_URL } from "../constants";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
-    acceptPolicy: false,
+    acceptPolicy: true,
   });
 
   const navigate = useNavigate();
@@ -19,14 +23,41 @@ const Signup = () => {
     e.preventDefault();
 
     if(formData.acceptPolicy === false) {
+      setLoading(false);
       toast.error("Please accept the privacy policy");
+      return;
     }
 
-    setTimeout(() => {
-      navigate("/verify-email");
-    }, 3000);
+    setLoading(true);
 
-    console.log("Form submitted:", formData);
+    if(loading) return;
+
+    try {
+      const { data } = await axios.post(`${BACKEND_BASE_URL}/api/auth/register`, {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if(!data.success) {
+        console.log("error response data", data.message);
+        toast.error(data.message);
+        return;
+      }
+
+      console.log("response data", data);
+      toast.success("User registered successfully");
+
+      navigate("/check-email", { state: { email: formData.email } });
+
+    } catch (error) {
+      console.error("Failed to register user", error);
+      toast.error(error?.response?.data?.message || "Something went wrong, Try again");
+    } finally {
+      setLoading(false);
+    }
+
+    
   };
 
   const handleInputChange = (e) => {
@@ -147,9 +178,11 @@ const Signup = () => {
           <div>
             <button
               type="submit"
+              disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
             >
-              Sign up
+                {loading && <LoaderCircle className="mr-2 animate-spin" color="#ffffff" strokeWidth={2} />}
+                {loading ? "Signing up..." : "Sign up"}
             </button>
           </div>
 

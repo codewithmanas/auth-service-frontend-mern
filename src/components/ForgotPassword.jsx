@@ -1,14 +1,51 @@
 import React, { useState } from "react";
-import { Mail } from "lucide-react";
-import { Link } from "react-router";
+import { LoaderCircle, Mail } from "lucide-react";
+import { Link, useLocation } from "react-router";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { BACKEND_BASE_URL } from "../constants";
 
 function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const location = useLocation();
+  const getEmail = location.state?.email || "";
 
-  const handleSubmit = (e) => {
+  const [email, setEmail] = useState(getEmail.trim());
+  const [submitted, setSubmitted] = useState(false);
+  // const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+
+      try {
+        const { data } = await axios.post(`${BACKEND_BASE_URL}/api/auth/forgot-password`, {
+          email: email,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+        if(!data.success) {
+          console.log("error response data", data.message);
+          toast.error(data.message);
+          setLoading(false);
+          return;
+        }
+
+        console.log("response data", data);
+
+        toast.success("Email sent successfully");
+        setSubmitted(true);
+        setLoading(false);
+        
+      } catch (error) {
+        console.log("forgot password error", error);
+        toast.error("Something went wrong, Try again");
+        setLoading(false);
+      }
+
   };
 
   if (submitted) {
@@ -71,7 +108,9 @@ function ForgotPassword() {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Reset password
+              {loading && <LoaderCircle className="mr-2 animate-spin" color="#ffffff" strokeWidth={2} />}
+              {loading ? "Resetting..." : "Reset password"}
+              
             </button>
           </div>
 

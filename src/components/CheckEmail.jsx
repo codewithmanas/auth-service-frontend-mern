@@ -3,17 +3,22 @@ import { useLocation } from "react-router";
 import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
-function VerifyEmail() {
+function CheckEmail() {
   const location = useLocation();
   const email = location.state?.email || "your email";
 
   const [resendEmail, setResendEmail] = useState(false);
 
   const resendEmailVerification = () => {
+
+    if(email === "your email") {
+      toast.error("Email not found");
+      return;
+    }
+
     setResendEmail(true);
     toast.success("Resend Email Successfully");
-  }
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -33,7 +38,11 @@ function VerifyEmail() {
           <div className="pt-4">
             <p className="text-sm text-gray-500">
               Didn't receive the email? Check your spam folder or{" "}
-              <button onClick={resendEmailVerification} disabled={resendEmail} className="text-indigo-600 hover:text-indigo-500 cursor-pointer">
+              <button
+                onClick={resendEmailVerification}
+                disabled={resendEmail}
+                className="text-indigo-600 hover:text-indigo-500 cursor-pointer"
+              >
                 resend verification email
               </button>
             </p>
@@ -44,4 +53,4 @@ function VerifyEmail() {
   );
 }
 
-export default VerifyEmail;
+export default CheckEmail;

@@ -1,19 +1,79 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, Github, Mail } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { Eye, EyeOff, Github, LoaderCircle, Mail } from "lucide-react";
 import clsx from "clsx";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { BACKEND_BASE_URL } from "../constants";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
+
+  const { user, checkAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
 
-  const handleSubmit = (e) => {
+  
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+  
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+
+    // Prevent double submission
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      const { data } = await axios.post(`${BACKEND_BASE_URL}/api/auth/login`, {
+        email: formData.email,
+        password: formData.password,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+      if(!data.success) {
+        console.log("error response data", data.message);
+        toast.error(data.message);
+        return;
+      }
+
+      console.log("response data", data);
+      toast.success("User logged in successfully");
+
+      // Revalidate auth status globally
+      await checkAuth();
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.error("Failed to login user", error);
+      const message = error?.response?.data?.message || "Something went wrong";
+      toast.error(message);
+
+      if(error?.response?.data?.statusCode === 403) {
+        navigate("/request-verification", { state: { email: formData.email } });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -105,7 +165,8 @@ const Login = () => {
 
               <div className="text-sm">
                 <Link
-                  to={"/forgot-password"}
+                  to="/forgot-password"
+                  state={{ email: formData.email }}
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot your password?
@@ -119,7 +180,8 @@ const Login = () => {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Sign in
+              {loading && <LoaderCircle className="mr-2 animate-spin" color="#ffffff" strokeWidth={2} />}
+              {loading ? "Logging In" : "Log In"}
             </button>
           </div>
 

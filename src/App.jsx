@@ -5,7 +5,12 @@ import { Toaster } from "react-hot-toast";
 import TermsOfService from "./components/TermsOfService";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import ForgotPassword from "./components/ForgotPassword";
-import VerifyEmail from "./components/VerifyEmail";
+import Dashboard from "./components/Dashboard";
+import EmailVerification from "./components/EmailVerification";
+import CheckEmail from "./components/CheckEmail";
+import RequestVerification from "./components/RequestVerification";
+import ResetPassword from "./components/ResetPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function Home () {
   const navigate = useNavigate();
@@ -42,10 +47,14 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/termsofservice" element={<TermsOfService />} />
       <Route path="/privacypolicy" element={<PrivacyPolicy />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/check-email" element={<CheckEmail />} />
+      <Route path="/verify-email" element={<EmailVerification />} />
+      <Route path="/request-verification" element={<RequestVerification />} />
       <Route path="*" element={<div>404, Path Not Found</div>} />
     </Routes>
     </>

@@ -1,0 +1,5 @@
+if(!import.meta.env.VITE_BACKEND_BASE_URL) {
+    throw new Error("VITE_BACKEND_BASE_URL is not defined");
+}
+
+export const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
