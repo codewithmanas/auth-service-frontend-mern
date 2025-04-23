@@ -11,6 +11,7 @@ import CheckEmail from "./components/CheckEmail";
 import RequestVerification from "./components/RequestVerification";
 import ResetPassword from "./components/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OAuthSuccess from "./components/OAuthSuccess";
 
 function Home () {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ function App() {
       <Route path="/check-email" element={<CheckEmail />} />
       <Route path="/verify-email" element={<EmailVerification />} />
       <Route path="/request-verification" element={<RequestVerification />} />
+      <Route path="/oauth-success" element={<OAuthSuccess />} />
       <Route path="*" element={<div>404, Path Not Found</div>} />
     </Routes>
     </>

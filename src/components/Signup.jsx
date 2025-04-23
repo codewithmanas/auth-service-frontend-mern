@@ -68,6 +68,11 @@ const Signup = () => {
     }));
   };
 
+  // Function to handle google login
+  const handleGoogleLogin = () => {
+    window.location.href = `${BACKEND_BASE_URL}/auth/google`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 bg-white p-6 sm:p-8 rounded-xl shadow-xl">
@@ -210,6 +215,7 @@ const Signup = () => {
               <span>GitHub</span>
             </button>
             <button
+              onClick={handleGoogleLogin}
               type="button"
               className={clsx(
                 "w-full inline-flex justify-center py-2 px-4 border border-gray-300 cursor-pointer",
